@@ -31,7 +31,7 @@ Example
     zwrc_store(delegate, newDelegate);
 }
 
-- (void)delegate
+- (void)dealloc
 {
     zwrc_clear(delegate);
     [super dealloc];
@@ -55,7 +55,7 @@ Simplified Delegate Example
 
 ZWRC_DELEGATE_SYNTHESIZE(BarDelegate);
 
-- (void)delegate
+- (void)dealloc
 {
     zwrc_delegate_clear();
     [super dealloc];
