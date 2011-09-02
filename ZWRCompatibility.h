@@ -10,7 +10,17 @@
 #ifndef ZWRCompatibility_h
 #define ZWRCompatibility_h
 
-#include <objc/runtime.h>
+#import <objc/runtime.h>
+#import <Availability.h>
+#import <TargetConditionals.h>
+
+#if TARGET_OS_IPHONE && defined(__IPHONE_5_0) && (__IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_5_0)
+	#define ZWRC_SDK_SUPPORTS_WEAK 1
+#elif TARGET_OS_MAC && defined(__MAC_10_7) && (__MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_7)
+	#define ZWRC_SDK_SUPPORTS_WEAK 1
+#else
+	#define ZWRC_SDK_SUPPORTS_WEAK 0
+#endif
 
 #if __has_feature(objc_arc)
 #define __zwrc_weak __unsafe_unretained
@@ -22,6 +32,7 @@
 
 static __attribute__((always_inline)) __attribute__((warn_unused_result)) inline id _zwrc_load(__zwrc_weak id *storage)
 {
+#if ZWRC_SDK_SUPPORTS_WEAK
     if (&objc_loadWeak != NULL) {
 #if __has_feature(objc_arc)
         return objc_loadWeak((__autoreleasing id *)(void *)storage);
@@ -29,12 +40,14 @@ static __attribute__((always_inline)) __attribute__((warn_unused_result)) inline
         return objc_loadWeak(storage);
 #endif
     }
+#endif
     return *storage;
 }
 #define zwrc_load(storage) ((__attribute__((warn_unused_result)) __typeof__(storage)(*)(__zwrc_weak id *))_zwrc_load)(&storage)
 
 static __attribute__((always_inline)) inline id _zwrc_store(__zwrc_weak id *storage, id value)
 {
+#if ZWRC_SDK_SUPPORTS_WEAK
     if (&objc_storeWeak != NULL) {
 #if __has_feature(objc_arc)
         objc_storeWeak((__autoreleasing id *)(void *)storage, value);
@@ -43,6 +56,7 @@ static __attribute__((always_inline)) inline id _zwrc_store(__zwrc_weak id *stor
 #endif
         return value;
     }
+#endif
     *storage = value;
     return value;
 }
@@ -68,6 +82,10 @@ static __attribute__((always_inline)) inline id _zwrc_store(__zwrc_weak id *stor
     ZWRC_SYNTHESIZE_SETTER(setter, ivar, type)
 
 // Delegate Macros
+
+#if !ZWRC_SDK_SUPPORTS_WEAK
+#define _zwrc_delegate _zwrn_delegate
+#endif
 
 #define ZWRC_DELEGATE_IVAR(...) \
     __zwrc_weak id<__VA_ARGS__> _zwrc_delegate;
