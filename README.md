@@ -12,7 +12,7 @@ Example
 @end
 
 @interface Foo : NSObject {
-    __zwr_weak id<FooDelegate> delegate;
+    __zwrc_weak id<FooDelegate> delegate;
 }
 
 @property (nonatomic, assign) id<FooDelegate> delegate;
