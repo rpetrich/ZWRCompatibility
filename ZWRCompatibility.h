@@ -60,7 +60,7 @@ static __attribute__((always_inline)) __attribute__((warn_unused_result)) inline
 #endif
     return *storage;
 }
-#define zwrc_load(storage) ((__attribute__((warn_unused_result)) __typeof__(storage)(*)(__zwrc_weak id *))_zwrc_load)(&storage)
+#define zwrc_load(storage) ((__typeof__(storage)(*)(__zwrc_weak id *))_zwrc_load)(&storage)
 
 static __attribute__((always_inline)) inline id _zwrc_store(__zwrc_weak id *storage, id value)
 {
